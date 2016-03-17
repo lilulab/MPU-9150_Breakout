@@ -66,8 +66,8 @@ Distributed as-is; no warranty is given.
 #include <Wire.h>
 #include "I2Cdev.h"
 #include "MPU6050_9Axis_MotionApps41.h"
-#include <Adafruit_GFX.h>
-#include <Adafruit_PCD8544.h>
+// #include <Adafruit_GFX.h>
+// #include <Adafruit_PCD8544.h>
 
 // Using NOKIA 5110 monochrome 84 x 48 pixel display
 // pin 9 - Serial clock out (SCLK)
@@ -75,7 +75,7 @@ Distributed as-is; no warranty is given.
 // pin 7 - Data/Command select (D/C)
 // pin 5 - LCD chip select (CS)
 // pin 6 - LCD reset (RST)
-Adafruit_PCD8544 display = Adafruit_PCD8544(9, 8, 7, 5, 6);
+// Adafruit_PCD8544 display = Adafruit_PCD8544(9, 8, 7, 5, 6);
 
 // Declare device MPU6050 class
 MPU6050 mpu;
@@ -111,40 +111,42 @@ float ax, ay, az, gx, gy, gz, mx, my, mz; // variables to hold latest sensor dat
 float q[4] = {1.0f, 0.0f, 0.0f, 0.0f};    // vector to hold quaternion
 float eInt[3] = {0.0f, 0.0f, 0.0f};       // vector to hold integral error for Mahony method
 
+int16_t q_int16[4] = {0,0,0,0}; // (int16_t)quaternion*10000 
+uint8_t q_int8[8] = {0,0,0,0, 0,0,0,0}; // (uint8_t)quaternion*10000 (HIGH+LOW BYTE)
 
 void setup()
 {
-  Serial.begin(38400); // Start serial at 38400 bps
+  Serial.begin(115200); // Start serial at 38400 bps
  
-  display.begin(); // Initialize the display
-  display.setContrast(58); // Set the contrast
-  display.setRotation(0); //  0 or 2) width = width, 1 or 3) width = height, swapped etc.
+  // display.begin(); // Initialize the display
+  // display.setContrast(58); // Set the contrast
+  // display.setRotation(0); //  0 or 2) width = width, 1 or 3) width = height, swapped etc.
   
 // Start device display with ID of sensor
-  display.clearDisplay();
-  display.setTextSize(2);
-  display.setCursor(0,0);  display.print("MPU9150");
-  display.setTextSize(1);
-  display.setCursor(0, 20); display.print("9 DOF sensor");
-  display.setCursor(0, 30); display.print("data fusion");
-  display.setCursor(20, 40); display.print("AHRS");
-  display.display();
+  // display.clearDisplay();
+  // display.setTextSize(2);
+  // display.setCursor(0,0);  // display.print("MPU9150");
+  // display.setTextSize(1);
+  // display.setCursor(0, 20); // display.print("9 DOF sensor");
+  // display.setCursor(0, 30); // display.print("data fusion");
+  // display.setCursor(20, 40); // display.print("AHRS");
+  // display.display();
   delay(2000);
 
 // Set up for data display
-  display.setTextSize(1); // Set text size to normal, 2 is twice normal etc.
-  display.setTextColor(BLACK); // Set pixel color; 1 on the monochrome screen
-  display.clearDisplay();   // clears the screen and buffer
-  display.display();
+  // display.setTextSize(1); // Set text size to normal, 2 is twice normal etc.
+  // display.setTextColor(BLACK); // Set pixel color; 1 on the monochrome screen
+  // display.clearDisplay();   // clears the screen and buffer
+  // display.display();
             
 
     // initialize MPU6050 device
-    Serial.println(F("Initializing I2C devices..."));
+    // Serial.println(F("Initializing I2C devices..."));
     mpu.initialize();
 
     // verify connection
-    Serial.println(F("Testing device connections..."));
-    Serial.println(mpu.testConnection() ? F("MPU9150 connection successful") : F("MPU9150 connection failed"));
+    // Serial.println(F("Testing device connections..."));
+    // Serial.println(mpu.testConnection() ? F("MPU9150 connection successful") : F("MPU9150 connection failed"));
 
 // Set up the accelerometer, gyro, and magnetometer for data output
 
@@ -228,22 +230,22 @@ void loop()
 
     // Serial print and/or display at 0.5 s rate independent of data rates
     delt_t = millis() - count;
-    if (delt_t > 500) { // update LCD once per half-second independent of read rate
+    if (delt_t > 100) { // update LCD once per half-second independent of read rate
 
-    Serial.print("ax = "); Serial.print((int)1000*ax);  
-    Serial.print(" ay = "); Serial.print((int)1000*ay); 
-    Serial.print(" az = "); Serial.print((int)1000*az); Serial.println(" mg");
-    Serial.print("gx = "); Serial.print( gx, 2); 
-    Serial.print(" gy = "); Serial.print( gy, 2); 
-    Serial.print(" gz = "); Serial.print( gz, 2); Serial.println(" deg/s");
-    Serial.print("mx = "); Serial.print( (int)mx ); 
-    Serial.print(" my = "); Serial.print( (int)my ); 
-    Serial.print(" mz = "); Serial.print( (int)mz ); Serial.println(" mG");
+    // Serial.print("ax = "); Serial.print((int)1000*ax);  
+    // Serial.print(" ay = "); Serial.print((int)1000*ay); 
+    // Serial.print(" az = "); Serial.print((int)1000*az); Serial.println(" mg");
+    // Serial.print("gx = "); Serial.print( gx, 2); 
+    // Serial.print(" gy = "); Serial.print( gy, 2); 
+    // Serial.print(" gz = "); Serial.print( gz, 2); Serial.println(" deg/s");
+    // Serial.print("mx = "); Serial.print( (int)mx ); 
+    // Serial.print(" my = "); Serial.print( (int)my ); 
+    // Serial.print(" mz = "); Serial.print( (int)mz ); Serial.println(" mG");
     
-    Serial.print("q0 = "); Serial.print(q[0]);
-    Serial.print(" qx = "); Serial.print(q[1]); 
-    Serial.print(" qy = "); Serial.print(q[2]); 
-    Serial.print(" qz = "); Serial.println(q[3]); 
+    // Serial.print("q0 = "); Serial.print(q[0]);
+    // Serial.print(" qx = "); Serial.print(q[1]); 
+    // Serial.print(" qy = "); Serial.print(q[2]); 
+    // Serial.print(" qz = "); Serial.println(q[3]); 
                    
     
   // Define output variables from updated quaternion---these are Tait-Bryan angles, commonly used in aircraft orientation.
@@ -255,46 +257,102 @@ void loop()
   // Tait-Bryan angles as well as Euler angles are non-commutative; that is, the get the correct orientation the rotations must be
   // applied in the correct order which for this configuration is yaw, pitch, and then roll.
   // For more see http://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles which has additional links.
-    yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);   
-    pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
-    roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
-    pitch *= 180.0f / PI;
-    yaw   *= 180.0f / PI - 13.8; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
-    roll  *= 180.0f / PI;
+    // yaw   = atan2(2.0f * (q[1] * q[2] + q[0] * q[3]), q[0] * q[0] + q[1] * q[1] - q[2] * q[2] - q[3] * q[3]);   
+    // pitch = -asin(2.0f * (q[1] * q[3] - q[0] * q[2]));
+    // roll  = atan2(2.0f * (q[0] * q[1] + q[2] * q[3]), q[0] * q[0] - q[1] * q[1] - q[2] * q[2] + q[3] * q[3]);
+    // pitch *= 180.0f / PI;
+    // // yaw   *= 180.0f / PI - 13.8; // Declination at Danville, California is 13 degrees 48 minutes and 47 seconds on 2014-04-04
+    // yaw   *= 180.0f / PI + 8.38; // Declination at Cleveland, Ohio is -8 degrees 23 minutes on 2016-03-16
+    // roll  *= 180.0f / PI;
 
-    Serial.print("Yaw, Pitch, Roll: ");
-    Serial.print(yaw, 2);
-    Serial.print(", ");
-    Serial.print(pitch, 2);
-    Serial.print(", ");
-    Serial.println(roll, 2);
+    // Serial.print("Yaw, Pitch, Roll: ");
+    // Serial.print(yaw, 2);
+    // Serial.print(", ");
+    // Serial.print(pitch, 2);
+    // Serial.print(", ");
+    // Serial.print(roll, 2);
     
-    Serial.print("rate = "); Serial.print((float)1.0f/deltat, 2); Serial.println(" Hz");
+    // Serial.print(", rate = "); Serial.print((float)1.0f/deltat, 2); Serial.println(" Hz");
 
-    display.clearDisplay();
+    // Serial.print(roll, 2);  Serial.print("\t");
+    // Serial.print(pitch, 2); Serial.print("\t");
+    // Serial.print(yaw, 2);   Serial.println("\t");
+
+    // only if serial get data
+    if (Serial.available() > 0) {
+      // read seiral
+      int incomingByte = Serial.read();
+
+
+      // if are desired command
+      if (incomingByte == 0xA0) {
+        // Send Start Byte
+        Serial.write(0x55); 
+    
+        // loop through four quaternion
+        for (uint8_t i=0; i<4; i++) {
+
+          // quaternion times 10k then cast into int16
+          q_int16[i] = (int16_t)(q[i]*10000);
+          //Serial.print(q_int16[i]);  Serial.print("\t");
+
+          // devide int16 to two int8
+          q_int8[i*2] = (uint8_t) ((q_int16[i] & 0xFF00) >> 8); // High Byte
+          q_int8[i*2+1] = (uint8_t) (q_int16[i] & 0x00FF); // Low Byte
+          
+          // test if correctly devide int16 to two int8
+          // NOTE : User can also this function to decode q_int8 to q_int16
+          // int16_t test = ( (int16_t) q_int8[i*2]<<8 & 0xFF00 ) | ( (int16_t)q_int8[i*2+1] & 0x00FF );
+          // Serial.print(q_int16[i]);
+          // Serial.print("?");
+          // Serial.print(test);
+          // Serial.print("\t");
+
+
+          // serial sent out the byte array
+          Serial.write(q_int8[i*2]); 
+          Serial.write(q_int8[i*2+1]); 
+
+
+        } // end for (uint8_t i=0; i<4; i++)
+
+        // Calulate and send out checksum Byte
+        Serial.write( checksum(q_int8, 8, 0x55));
+
+        // Serial.println(" ");
+
+      } // end if (incomingByte == 0xA0)
+    } // end if (Serial.available() > 0)
+
+
+
+
+
+
+    // display.clearDisplay();
      
  
-    display.setCursor(0, 0); display.print(" x   y   z  ");
+    // display.setCursor(0, 0); // display.print(" x   y   z  ");
 
-    display.setCursor(0,  8); display.print((int)(1000*ax)); 
-    display.setCursor(24, 8); display.print((int)(1000*ay)); 
-    display.setCursor(48, 8); display.print((int)(1000*az)); 
-    display.setCursor(72, 8); display.print("mg");
+    // display.setCursor(0,  8); // display.print((int)(1000*ax)); 
+    // display.setCursor(24, 8); // display.print((int)(1000*ay)); 
+    // display.setCursor(48, 8); // display.print((int)(1000*az)); 
+    // display.setCursor(72, 8); // display.print("mg");
     
-    display.setCursor(0,  16); display.print((int)(gx)); 
-    display.setCursor(24, 16); display.print((int)(gy)); 
-    display.setCursor(48, 16); display.print((int)(gz)); 
-    display.setCursor(66, 16); display.print("o/s");    
+    // display.setCursor(0,  16); // display.print((int)(gx)); 
+    // display.setCursor(24, 16); // display.print((int)(gy)); 
+    // display.setCursor(48, 16); // display.print((int)(gz)); 
+    // display.setCursor(66, 16); // display.print("o/s");    
 
-    display.setCursor(0,  24); display.print((int)(mx)); 
-    display.setCursor(24, 24); display.print((int)(my)); 
-    display.setCursor(48, 24); display.print((int)(mz)); 
-    display.setCursor(72, 24); display.print("mG");    
+    // display.setCursor(0,  24); // display.print((int)(mx)); 
+    // display.setCursor(24, 24); // display.print((int)(my)); 
+    // display.setCursor(48, 24); // display.print((int)(mz)); 
+    // display.setCursor(72, 24); // display.print("mG");    
  
-    display.setCursor(0,  32); display.print((int)(yaw)); 
-    display.setCursor(24, 32); display.print((int)(pitch)); 
-    display.setCursor(48, 32); display.print((int)(roll)); 
-    display.setCursor(66, 32); display.print("ypr");  
+    // display.setCursor(0,  32); // display.print((int)(yaw)); 
+    // display.setCursor(24, 32); // display.print((int)(pitch)); 
+    // display.setCursor(48, 32); // display.print((int)(roll)); 
+    // display.setCursor(66, 32); // display.print("ypr");  
   
     // With these settings the filter is updating at a ~145 Hz rate using the Madgwick scheme and 
     // >200 Hz using the Mahony scheme even though the display refreshes at only 2 Hz.
@@ -307,12 +365,22 @@ void loop()
     // stabilization control of a fast-moving robot or quadcopter. Compare to the update rate of 200 Hz
     // produced by the on-board Digital Motion Processor of Invensense's MPU6050 6 DoF and MPU9150 9DoF sensors.
     // The 3.3 V 8 MHz Pro Mini is doing pretty well!
-    display.setCursor(0, 40); display.print("rt: "); display.print((1/deltat)); display.print(" Hz"); 
+    // display.setCursor(0, 40); // display.print("rt: "); // display.print((1/deltat)); // display.print(" Hz"); 
 
-    display.display();
+    // display.display();
     count = millis();
     }
 }
+
+// Retun check sum byte
+uint8_t checksum(uint8_t vals[], int length, uint8_t bias){
+  uint16_t csum = bias;
+  for(int i=0; i<length-1; i++) {
+    csum += (uint16_t)vals[i];
+  }
+  csum = ((0x00FF & csum) + (csum >> 8))^0xFF;
+  return (uint8_t)csum;
+} 
 
 
 // Implementation of Sebastian Madgwick's "...efficient orientation filter for... inertial/magnetic sensor arrays"
