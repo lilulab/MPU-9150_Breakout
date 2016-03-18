@@ -96,6 +96,8 @@ MPU6050 mpu;
 #define Kp 2.0f * 5.0f // these are the free parameters in the Mahony filter and fusion scheme, Kp for proportional feedback, Ki for integral
 #define Ki 0.0f
 
+#define LED 13
+
 int16_t a1, a2, a3, g1, g2, g3, m1, m2, m3;     // raw data arrays reading
 uint16_t count = 0;  // used to control display output rate
 uint16_t delt_t = 0; // used to control display output rate
@@ -116,6 +118,8 @@ uint8_t q_int8[8] = {0,0,0,0, 0,0,0,0}; // (uint8_t)quaternion*10000 (HIGH+LOW B
 
 void setup()
 {
+  pinMode(LED, OUTPUT);
+
   Serial.begin(115200); // Start serial at 38400 bps
  
   // display.begin(); // Initialize the display
@@ -186,6 +190,8 @@ void setup()
 
 void loop()
 {
+  digitalWrite(LED, !digitalRead(LED));    // Toggle LED
+
          if(mpu.getIntDataReadyStatus() == 1) { // wait for data ready status register to update all data registers
             mcount++;
            // read the raw sensor data
@@ -280,6 +286,9 @@ void loop()
 
     // only if serial get data
     if (Serial.available() > 0) {
+
+      //digitalWrite(LED, HIGH);   // turn the LED on (HIGH is the voltage level)
+
       // read seiral
       int incomingByte = Serial.read();
 
@@ -319,9 +328,14 @@ void loop()
         // Calulate and send out checksum Byte
         Serial.write( checksum(q_int8, 8, 0x55));
 
+        Serial.write(Serial.available());
+        Serial.write(Serial.availableForWrite());
+
         // Serial.println(" ");
 
       } // end if (incomingByte == 0xA0)
+
+      //digitalWrite(LED, LOW);    // turn the LED off by making the voltage LOW
     } // end if (Serial.available() > 0)
 
 
